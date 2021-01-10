@@ -29,6 +29,12 @@ class PuzzleExporter(object):
     def export(self, pgn_headers=None) -> Game:
         """ pgn_headers - PGN headers to include in the exported PGN
         """
+        if pgn_headers:
+            for h in pgn_headers:
+                if h == "FEN":
+                    continue
+                self.puzzle.game.headers[h] = pgn_headers[h]
+
         fen = self.puzzle.initial_board.fen()
         board = chess.Board(fen)
         game = Game().from_board(board)

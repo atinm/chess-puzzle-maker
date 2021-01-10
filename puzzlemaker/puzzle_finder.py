@@ -49,8 +49,8 @@ def should_investigate(a: Score, b: Score, board: Board) -> bool:
     b_cp = b.score()
     if a_cp is not None and material_total(board) > 3:
         if b_cp is not None and material_count(board) > 6:
-            # from an even position, the position changed by more than 1.1 cp
-            if abs(a_cp) < 110 and abs(b_cp - a_cp) >= 110:
+            # from an even position, the position changed by more than 2.1 cp (more than 2 pawns to make solutions easier)
+            if abs(a_cp) < 210 and abs(b_cp - a_cp) >= 210:
                 return True
             # from a winning position, the position is now even
             elif abs(a_cp) > 200 and abs(b_cp) < 110:

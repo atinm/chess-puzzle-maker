@@ -762,7 +762,7 @@ class Puzzle(object):
         else:
             return None
 
-    def category(self, game = None) -> Optional[str]:
+    def category(self) -> Optional[str]:
         """ Mate     - win by checkmate
             Material - gain a material advantage
             Equalize - equalize a losing position
@@ -790,18 +790,15 @@ class Puzzle(object):
                 if abs(final_material_diff - initial_material_diff) > 0.1:
                     if abs(final_cp - initial_cp) > 600:
                         tags.append("crushing")
-                    elif abs(final_cp - initial_cp) > 100:
+                    elif abs(final_cp - initial_cp) > 200:
                         tags.append("advantage")
                     elif not self.initial_move:
                         # a puzzle from a position, not a sequence of moves
-                        if final_cp > 100 or final_cp < -100:
+                        if final_cp > 200 or final_cp < -200:
                             tags.append("advantage")
 
         # if we are exporting, we have a game we can use to do additional categorizations
-        if game != None:
-            self.game = game
-            self.mainline = list(self.game.mainline())
-
+        if self.game != None:
             if "mate" in tags:
                 if self.smothered_mate():
                     tags.append("smotheredMate")
@@ -900,16 +897,20 @@ class Puzzle(object):
                 elif self.queenside_attack():
                     tags.append("queensideAttack")
 
-        if len(self.mainline) == 2:
-            tags.append("oneMove")
-        elif len(self.mainline) <= 4:
-            tags.append("short")
-        elif len(self.mainline) >= 8:
-            tags.append("veryLong")
-        else:
-            tags.append("long")
+        # we should have some categories beyond just length
+        if tags.count() > 0:
+            if len(self.mainline) == 2:
+                tags.append("oneMove")
+            elif len(self.mainline) <= 4:
+                tags.append("short")
+            elif len(self.mainline) >= 8:
+                tags.append("veryLong")
+            else:
+                tags.append("long")
 
-        return " ".join(tags)
+            return " ".join(tags)
+        else:
+            return None
 
     def winner(self) -> Optional[str]:
         """ Find the winner of the puzzle based on the move sequence
@@ -949,6 +950,30 @@ class Puzzle(object):
         n_player_moves += int((len(self.positions) - 1) / 2)
         if n_player_moves < MIN_PLAYER_MOVES:
             return False
-        if self.category():
+        fen = self.initial_board.fen()
+        board = chess.Board(fen)
+        self.game = Game().from_board(board)
+        game_node = self.game
+        game_node.comment = "score: %s -> %s" % (
+            _score_to_str(self.initial_score),
+            _score_to_str(self.final_score)
+        )
+        comment = self._candidate_moves_annotations(self.analyzed_moves)
+        for position in self.positions:
+            game_node = game_node.add_variation(
+                chess.Move.from_uci(position.initial_move.uci())
+            )
+            if comment:
+                game_node.comment = comment
+            comment = self._candidate_moves_annotations(position.candidate_moves)
+        self.mainline = list(self.game.mainline())
+        category = self.category()
+        self.game.headers['PuzzleCategory'] = category
+        puzzle_winner = self.winner()
+        if puzzle_winner:
+            self.game.headers['PuzzleWinner'] = puzzle_winner
+        self.game.headers['PuzzleEngine'] = AnalysisEngine.name()
+        self.game.headers['PuzzleMakerVersion'] = __version__
+        if category:
             return True
         return False
