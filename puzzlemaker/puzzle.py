@@ -900,11 +900,11 @@ class Puzzle(object):
                 elif self.queenside_attack():
                     tags.append("queensideAttack")
 
-        if len(self.positions) == 2:
+        if len(self.mainline) == 2:
             tags.append("oneMove")
-        elif len(self.positions) <= 4:
+        elif len(self.mainline) <= 4:
             tags.append("short")
-        elif len(self.positions) >= 8:
+        elif len(self.mainline) >= 8:
             tags.append("veryLong")
         else:
             tags.append("long")
