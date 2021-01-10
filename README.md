@@ -23,10 +23,14 @@ For a list of options:
 ## Requirements
 
 This requires Python 3 and a UCI-compatible chess engine such as Stockfish.
-
+`
 Install the required python libraries:
 
-`pip3 install -r requirements.txt`
+```
+python3 -m venv venv
+. venv/bin/activate
+pip3 install -r requirements.txt
+```
 
 Make sure you have a version of Stockfish available in your `$PATH` or local directory:
 
