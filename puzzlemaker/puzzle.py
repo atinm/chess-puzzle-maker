@@ -15,6 +15,8 @@ from puzzlemaker.analysis import AnalysisEngine, AnalyzedMove
 import puzzlemaker.utils
 from puzzlemaker.utils import material_difference, material_diff
 from puzzlemaker.constants import MIN_PLAYER_MOVES
+from puzzlemaker.analysis import AnalysisEngine
+from puzzlemaker.version import __version__
 
 TagKind = Literal[
     "advancedPawn",
@@ -898,7 +900,7 @@ class Puzzle(object):
                     tags.append("queensideAttack")
 
         # we should have some categories beyond just length
-        if tags.count() > 0:
+        if len(tags) > 0:
             if len(self.mainline) == 2:
                 tags.append("oneMove")
             elif len(self.mainline) <= 4:
@@ -942,6 +944,21 @@ class Puzzle(object):
             elif final_cp < -100:
                 return "Black"
 
+    def _score_to_str(self, score) -> str:
+        if score.is_mate():
+            return "mate in %d" % score.mate()
+        else:
+            return score.cp
+
+    def _candidate_moves_annotations(self, candidate_moves) -> str:
+        """ Returns the candidate moves with evaluations for PGN comments
+        """
+        comment = ""
+        for candidate_move in candidate_moves:
+            comment += candidate_move.move_san
+            comment += " (%s) " % self._score_to_str(candidate_move.score)
+        return comment.strip()
+
     def is_complete(self) -> bool:
         """ Verify that this sequence of moves represents a complete puzzle
             Incomplete if too short or if the puzzle could not be categorized
@@ -955,8 +972,8 @@ class Puzzle(object):
         self.game = Game().from_board(board)
         game_node = self.game
         game_node.comment = "score: %s -> %s" % (
-            _score_to_str(self.initial_score),
-            _score_to_str(self.final_score)
+            self._score_to_str(self.initial_score),
+            self._score_to_str(self.final_score)
         )
         comment = self._candidate_moves_annotations(self.analyzed_moves)
         for position in self.positions:
