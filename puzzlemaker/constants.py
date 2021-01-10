@@ -9,3 +9,6 @@ MIN_PLAYER_MOVES = 2
 
 # number of candidate moves to analyze for each puzzle position
 NUM_CANDIDATE_MOVES = 3
+
+# mate in MATE_THRESHOLD
+MATE_THRESHOLD = 15

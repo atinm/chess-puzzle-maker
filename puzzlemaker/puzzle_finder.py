@@ -9,7 +9,7 @@ from puzzlemaker.colors import Color
 from puzzlemaker.analysis import AnalysisEngine
 from puzzlemaker.puzzle import Puzzle
 from puzzlemaker.utils import sign, material_total, material_count
-from puzzlemaker.constants import SCAN_DEPTH
+from puzzlemaker.constants import SCAN_DEPTH, MATE_THRESHOLD
 
 
 def find_puzzle_candidates(game: Game, scan_depth=SCAN_DEPTH) -> List[Puzzle]:
@@ -59,8 +59,8 @@ def should_investigate(a: Score, b: Score, board: Board) -> bool:
             elif abs(a_cp) > 200 and sign(b) != sign(a):
                 return True
         elif b.is_mate():
-            # from an even position, someone is getting checkmated
-            if abs(a_cp) < 110:
+            # less than a queen down and fell into a "mate in" threshold moves or less
+            if abs(a_cp) < 900 and abs(b.mate()) <= MATE_THRESHOLD:
                 return True
             # from a major advantage, blundering and getting checkmated
             elif sign(a) != sign(b):

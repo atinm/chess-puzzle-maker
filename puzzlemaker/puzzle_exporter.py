@@ -50,7 +50,7 @@ class PuzzleExporter(object):
                 if h == "FEN":
                     continue
                 game.headers[h] = pgn_headers[h]
-        game.headers['PuzzleCategory'] = self.puzzle.category()
+        game.headers['PuzzleCategory'] = self.puzzle.category(game)
         puzzle_winner = self.puzzle.winner()
         if puzzle_winner:
             game.headers['PuzzleWinner'] = puzzle_winner
