@@ -984,13 +984,13 @@ class Puzzle(object):
                 game_node.comment = comment
             comment = self._candidate_moves_annotations(position.candidate_moves)
         self.mainline = list(self.game.mainline())
-        category = self.category()
-        self.game.headers['PuzzleCategory'] = category
         puzzle_winner = self.winner()
         if puzzle_winner:
             self.game.headers['PuzzleWinner'] = puzzle_winner
         self.game.headers['PuzzleEngine'] = AnalysisEngine.name()
         self.game.headers['PuzzleMakerVersion'] = __version__
+        category = self.category()
         if category:
+            self.game.headers['PuzzleCategory'] = category
             return True
         return False
