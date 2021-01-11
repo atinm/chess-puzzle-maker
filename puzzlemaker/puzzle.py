@@ -799,7 +799,7 @@ class Puzzle(object):
                         if final_cp > 200 or final_cp < -200:
                             tags.append("advantage")
 
-        # if we are exporting, we have a game we can use to do additional categorizations
+        # we have game, we can do more categorization
         if self.game != None:
             if "mate" in tags:
                 if self.smothered_mate():
@@ -899,8 +899,8 @@ class Puzzle(object):
                 elif self.queenside_attack():
                     tags.append("queensideAttack")
 
-        # we should have some categories beyond just length
-        if len(tags) > 0:
+        # we should have either a mate or a material advantage change
+        if (any(x in ["mate", "equality", "crushing", "advantage"] for x in tags)):
             if len(self.mainline) == 2:
                 tags.append("oneMove")
             elif len(self.mainline) <= 4:
