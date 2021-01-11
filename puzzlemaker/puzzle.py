@@ -750,19 +750,18 @@ class Puzzle(object):
         return all(test(self.mainline[i].board()) for i in [0, 1])
 
     def mate_in(self) -> Optional[TagKind]:
-        if self.final_score.is_mate():
-            position = self.positions[0]
-            if abs(position.score.mate()) == 1:
-                return "mateIn1"
-            elif abs(position.score.mate()) == 2:
-                return "mateIn2"
-            elif abs(position.score.mate()) == 3:
-                return "mateIn3"
-            elif abs(position.score.mate()) == 4:
-                return "mateIn4"
-            return "mateIn5"
-        else:
+        if not self.game.end().board().is_checkmate():
             return None
+        moves_to_mate = len(self.mainline) // 2
+        if moves_to_mate == 1:
+            return "mateIn1"
+        elif moves_to_mate == 2:
+            return "mateIn2"
+        elif moves_to_mate == 3:
+            return "mateIn3"
+        elif moves_to_mate == 4:
+            return "mateIn4"
+        return "mateIn5"
 
     def category(self) -> Optional[str]:
         """ Mate     - win by checkmate
